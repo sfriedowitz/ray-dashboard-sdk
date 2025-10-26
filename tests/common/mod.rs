@@ -4,7 +4,7 @@
 // use std::sync::Mutex;
 
 // static RAY_GUARD: Lazy<Mutex<Option<RayGuard>>> = Lazy::new(|| Mutex::new(None));
-// pub static RAY_DASHBOARD_URL: &str = "http://127.0.0.1:8265";
+pub static RAY_DASHBOARD_URL: &str = "http://127.0.0.1:8265";
 
 // pub struct RayGuard;
 

@@ -1,4 +1,2 @@
-#[allow(warnings)]
-pub mod jobs {
-    include!(concat!(env!("OUT_DIR"), "/jobs.rs"));
-}
+mod constants;
+pub mod jobs;
