@@ -3,5 +3,4 @@ mod constants;
 mod error;
 mod schemas;
 
-pub use crate::error::Error;
-pub use crate::error::Result;
+pub use crate::error::{Error, Result};
