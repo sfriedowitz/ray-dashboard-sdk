@@ -6,7 +6,7 @@
     "description": "This is the specification for the Ray Jobs REST API.\nSee the Ray Jobs documentation for details:\nhttps://docs.ray.io/en/latest/cluster/running-applications/job-submission/index.html\n"
   },
   "paths": {
-    "/api/version": {
+    "/api/version/": {
       "get": {
         "summary": "Get Version\n",
         "description": "Get the Ray Jobs API version and the Ray version running on the cluster.\n",
@@ -40,7 +40,7 @@
         }
       }
     },
-    "/api/jobs": {
+    "/api/jobs/": {
       "post": {
         "summary": "Submit Job\n",
         "description": "Submit a job to the cluster.\n",
@@ -116,7 +116,7 @@
         }
       }
     },
-    "/api/jobs/{submission_id}": {
+    "/api/jobs/{submission_id}/": {
       "get": {
         "summary": "Get Job Details",
         "description": "Get the status and details of a job.\n",
@@ -225,7 +225,7 @@
         }
       }
     },
-    "/api/jobs/{submission_id}/stop": {
+    "/api/jobs/{submission_id}/stop/": {
       "post": {
         "summary": "Stop Job",
         "description": "Stop a job.\n",
@@ -292,7 +292,7 @@
         }
       }
     },
-    "/api/jobs/{submission_id}/logs": {
+    "/api/jobs/{submission_id}/logs/": {
       "get": {
         "summary": "Get Job Logs",
         "description": "Get the logs of a job.\n",
