@@ -1,2 +1,6 @@
+mod clients;
 mod constants;
-pub mod jobs;
+mod error;
+mod schemas;
+
+pub use error::{Error, Result};
