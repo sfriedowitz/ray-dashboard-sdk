@@ -16,7 +16,7 @@ pub enum RuntimeEnvUVSettings {
 #[derive(Debug, Default, Clone, serde::Deserialize, serde::Serialize)]
 pub struct RuntimeEnvConfig {
     #[serde(skip_serializing_if = "Option::is_none")]
-    setup_timeout_seconds: Option<u32>,
+    setup_timeout_seconds: Option<u64>,
     #[serde(skip_serializing_if = "Option::is_none")]
     eager_install: Option<bool>,
 }
@@ -26,7 +26,7 @@ impl RuntimeEnvConfig {
         Default::default()
     }
 
-    pub fn with_setup_timeout_seconds(mut self, seconds: u32) -> Self {
+    pub fn with_setup_timeout_seconds(mut self, seconds: u64) -> Self {
         self.setup_timeout_seconds = Some(seconds);
         self
     }
@@ -48,9 +48,9 @@ pub struct RuntimeEnv {
     #[serde(skip_serializing_if = "Option::is_none")]
     config: Option<RuntimeEnvConfig>,
     #[serde(skip_serializing_if = "Option::is_none")]
-    uv: Option<RuntimeEnvPipSettings>,
+    pip: Option<RuntimeEnvPipSettings>,
     #[serde(skip_serializing_if = "Option::is_none")]
-    pip: Option<RuntimeEnvUVSettings>,
+    uv: Option<RuntimeEnvUVSettings>,
 }
 
 impl RuntimeEnv {
@@ -58,27 +58,24 @@ impl RuntimeEnv {
         Default::default()
     }
 
-    pub fn with_working_dir(mut self, working_dir: Option<&str>) -> Self {
-        self.working_dir = working_dir.map(Into::into);
+    pub fn with_working_dir(mut self, working_dir: impl Into<String>) -> Self {
+        self.working_dir = Some(working_dir.into());
         self
     }
 
-    pub fn with_env_var(mut self, name: &str, value: &str) -> Self {
+    pub fn with_env_var(mut self, name: impl Into<String>, value: impl Into<String>) -> Self {
         if self.env_vars.is_none() {
             self.env_vars = Some(HashMap::new());
         }
-        self.env_vars
-            .as_mut()
-            .unwrap()
-            .insert(name.to_string(), value.to_string());
+        self.env_vars.as_mut().unwrap().insert(name.into(), value.into());
         self
     }
 
-    pub fn with_py_modules(mut self, module: &str) -> Self {
+    pub fn with_py_module(mut self, module: impl Into<String>) -> Self {
         if self.py_modules.is_none() {
             self.py_modules = Some(Vec::new());
         }
-        self.py_modules.as_mut().unwrap().push(module.to_string());
+        self.py_modules.as_mut().unwrap().push(module.into());
         self
     }
 
@@ -87,16 +84,34 @@ impl RuntimeEnv {
         self
     }
 
-    pub fn with_pip(mut self, pip: RuntimeEnvUVSettings) -> Self {
+    pub fn with_pip(mut self, pip: RuntimeEnvPipSettings) -> Self {
         self.pip = Some(pip);
         self
     }
 
-    pub fn with_uv(mut self, uv: RuntimeEnvPipSettings) -> Self {
+    pub fn with_uv(mut self, uv: RuntimeEnvUVSettings) -> Self {
         self.uv = Some(uv);
         self
     }
 }
 
 #[cfg(test)]
-mod tests {}
+mod tests {
+    use super::RuntimeEnv;
+
+    #[test]
+    fn test_skip_none() {
+        let env = RuntimeEnv::new();
+        let json = serde_json::to_value(&env).unwrap();
+        let expected = serde_json::json!({});
+        assert_eq!(json, expected);
+    }
+
+    #[test]
+    fn test_round_trip() {
+        let env = RuntimeEnv::new().with_working_dir("/tests");
+        let value = serde_json::to_value(&env).unwrap();
+        let deserialized_env: RuntimeEnv = serde_json::from_value(value).unwrap();
+        assert_eq!(deserialized_env.working_dir, Some("/tests".to_string()));
+    }
+}
