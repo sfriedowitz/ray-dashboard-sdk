@@ -3,16 +3,6 @@
 use serde;
 use std::collections::HashMap;
 
-#[derive(Debug, Clone, serde::Deserialize, serde::Serialize)]
-pub enum RuntimeEnvPipSettings {
-    Packages(Vec<String>),
-}
-
-#[derive(Debug, Clone, serde::Deserialize, serde::Serialize)]
-pub enum RuntimeEnvUVSettings {
-    Packages(Vec<String>),
-}
-
 #[derive(Debug, Default, Clone, serde::Deserialize, serde::Serialize)]
 pub struct RuntimeEnvConfig {
     #[serde(skip_serializing_if = "Option::is_none")]
@@ -48,9 +38,9 @@ pub struct RuntimeEnv {
     #[serde(skip_serializing_if = "Option::is_none")]
     config: Option<RuntimeEnvConfig>,
     #[serde(skip_serializing_if = "Option::is_none")]
-    pip: Option<RuntimeEnvPipSettings>,
+    pip: Option<Vec<String>>,
     #[serde(skip_serializing_if = "Option::is_none")]
-    uv: Option<RuntimeEnvUVSettings>,
+    uv: Option<Vec<String>>,
 }
 
 impl RuntimeEnv {
@@ -84,13 +74,13 @@ impl RuntimeEnv {
         self
     }
 
-    pub fn with_pip(mut self, pip: RuntimeEnvPipSettings) -> Self {
-        self.pip = Some(pip);
+    pub fn with_pip(mut self, pip: &[String]) -> Self {
+        self.pip = Some(pip.to_vec());
         self
     }
 
-    pub fn with_uv(mut self, uv: RuntimeEnvUVSettings) -> Self {
-        self.uv = Some(uv);
+    pub fn with_uv(mut self, uv: &[String]) -> Self {
+        self.uv = Some(uv.to_vec());
         self
     }
 }
