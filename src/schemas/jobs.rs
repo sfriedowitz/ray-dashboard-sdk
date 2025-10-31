@@ -44,35 +44,23 @@ impl JobSubmitRequest {
         }
     }
 
-    pub fn with_entrypoint<T>(mut self, entrypoint: T) -> Self
-    where
-        T: Into<String>,
-    {
+    pub fn with_entrypoint(mut self, entrypoint: impl Into<String>) -> Self {
         self.entrypoint = entrypoint.into();
         self
     }
 
-    pub fn with_submission_id<T>(mut self, submission_id: T) -> Self
-    where
-        T: Into<Option<String>>,
-    {
-        self.submission_id = submission_id.into();
+    pub fn with_submission_id(mut self, submission_id: impl Into<String>) -> Self {
+        self.submission_id = Some(submission_id.into());
         self
     }
 
-    pub fn with_runtime_env<T>(mut self, runtime_env: T) -> Self
-    where
-        T: Into<Option<RuntimeEnv>>,
-    {
-        self.runtime_env = runtime_env.into();
+    pub fn with_runtime_env(mut self, runtime_env: RuntimeEnv) -> Self {
+        self.runtime_env = Some(runtime_env);
         self
     }
 
-    pub fn with_metadata<T>(mut self, metadata: T) -> Self
-    where
-        T: Into<Option<HashMap<String, String>>>,
-    {
-        self.metadata = metadata.into();
+    pub fn with_metadata(mut self, metadata: HashMap<String, String>) -> Self {
+        self.metadata = Some(metadata);
         self
     }
 
@@ -84,35 +72,23 @@ impl JobSubmitRequest {
         self
     }
 
-    pub fn with_entrypoint_num_cpus<T>(mut self, num_cpus: T) -> Self
-    where
-        T: Into<Option<f64>>,
-    {
-        self.entrypoint_num_cpus = num_cpus.into();
+    pub fn with_entrypoint_num_cpus(mut self, num_cpus: f64) -> Self {
+        self.entrypoint_num_cpus = Some(num_cpus);
         self
     }
 
-    pub fn with_entrypoint_num_gpus<T>(mut self, num_gpus: T) -> Self
-    where
-        T: Into<Option<f64>>,
-    {
-        self.entrypoint_num_gpus = num_gpus.into();
+    pub fn with_entrypoint_num_gpus(mut self, num_gpus: f64) -> Self {
+        self.entrypoint_num_gpus = Some(num_gpus);
         self
     }
 
-    pub fn with_entrypoint_memory<T>(mut self, memory: T) -> Self
-    where
-        T: Into<Option<u64>>,
-    {
-        self.entrypoint_memory = memory.into();
+    pub fn with_entrypoint_memory(mut self, memory: u64) -> Self {
+        self.entrypoint_memory = Some(memory);
         self
     }
 
-    pub fn with_entrypoint_resources<T>(mut self, resources: T) -> Self
-    where
-        T: Into<Option<HashMap<String, f64>>>,
-    {
-        self.entrypoint_resources = resources.into();
+    pub fn with_entrypoint_resources(mut self, resources: HashMap<String, f64>) -> Self {
+        self.entrypoint_resources = Some(resources);
         self
     }
 }
@@ -145,22 +121,28 @@ pub struct JobDetails {
 
 #[derive(Debug, Clone, serde::Deserialize, serde::Serialize)]
 pub struct JobSubmitResponse {
-    submission_id: String,
+    pub submission_id: String,
 }
 
 #[derive(Debug, Clone, Copy, serde::Deserialize, serde::Serialize)]
 pub struct JobStopResponse {
-    stopped: bool,
+    pub stopped: bool,
 }
 
 #[derive(Debug, Clone, Copy, serde::Deserialize, serde::Serialize)]
 pub struct JobDeleteResponse {
-    deleted: bool,
+    pub deleted: bool,
 }
 
 #[derive(Debug, Clone, serde::Deserialize, serde::Serialize)]
 pub struct JobLogsResponse {
-    logs: String,
+    pub logs: String,
+}
+
+impl JobLogsResponse {
+    pub fn lines(&self) -> impl Iterator<Item = &str> {
+        self.logs.lines()
+    }
 }
 
 #[cfg(test)]
@@ -190,8 +172,17 @@ mod tests {
     #[test]
     fn test_job_submit_request_builder() {
         let request = JobSubmitRequest::new("python script.py")
-            .with_submission_id(Some("sub123"))
-            .with_submission_id(None)
-            .with_entrypoint_num_cpus(4.0);
+            .with_submission_id("submission_123")
+            .with_entrypoint_num_cpus(4.0)
+            .with_entrypoint_num_gpus(2.0)
+            .with_entrypoint_memory(1024)
+            .with_metadata_item("environment", "dev");
+
+        assert!(request.submission_id.is_some());
+        assert!(request.entrypoint_num_cpus.is_some());
+        assert!(request.entrypoint_num_gpus.is_some());
+        assert!(request.entrypoint_memory.is_some());
+        assert!(request.metadata.is_some());
+        assert!(request.metadata.unwrap().get("environment").unwrap() == "dev")
     }
 }

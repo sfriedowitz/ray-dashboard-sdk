@@ -4,6 +4,8 @@ pub type Result<T> = std::result::Result<T, Error>;
 
 #[derive(Debug, Error)]
 pub enum Error {
+    #[error("HTTP error: {0}")]
+    Request(#[from] reqwest::Error),
     #[error("Generic error: {0}")]
     Generic(String),
 }
