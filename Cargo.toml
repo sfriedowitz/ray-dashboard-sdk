@@ -2,6 +2,12 @@
 name = "ray-dashboard-sdk"
 version = "0.1.0"
 edition = "2024"
+description = "A simple Rust client for the Ray dashboard REST API."
+keywords = ["rust", "ray", "dashboard", "sdk", "client"]
+authors = ["Sean Friedowitz <sfriedowitz93@gmail.com"]
+repository = "https://github.com/sfriedowitz/ray-dashboard-sdk"
+readme = "README.md"
+license-file = "LICENSE"
 
 [dependencies]
 futures-timer = "3.0.3"
