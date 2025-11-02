@@ -1,6 +1,7 @@
 use std::time::Duration;
 
 use tokio::time::{Instant, sleep};
+use tracing::info;
 
 use crate::schemas::jobs::{
     JobDeleteResponse, JobDetails, JobLogsResponse, JobStatus, JobStopResponse, JobSubmitRequest,
@@ -16,7 +17,7 @@ pub struct JobSubmissionClient {
 // Constructors
 impl JobSubmissionClient {
     pub fn new(base_url: &str) -> crate::Result<Self> {
-        let client = reqwest::Client::builder().build().unwrap();
+        let client = reqwest::Client::builder().build()?;
         Self::new_with_client(base_url, client)
     }
 
@@ -29,6 +30,7 @@ impl JobSubmissionClient {
     /// Ray dashboard server requires User-Agent header to be set or else 500s.
     fn base_request(&self, method: reqwest::Method, path: &str) -> crate::Result<reqwest::RequestBuilder> {
         let url = self.base_url.join(path)?;
+        info!("Building request: {} {}", method, url);
         let request = self
             .client
             .request(method, url)
@@ -99,8 +101,8 @@ impl JobSubmissionClient {
         Ok(response.json::<JobLogsResponse>().await?)
     }
 
-    /// Wait for the job to reach a terminal state up to the max duration.
-    /// Return an error if the job does not reach a terminal state within the duration.
+    /// Wait for the job to reach a terminal state
+    /// Return an error if the job does not reach a terminal state within the provided max duration.
     pub async fn wait_for_terminal<D: Into<std::time::Duration>>(
         &self,
         submission_id: &str,

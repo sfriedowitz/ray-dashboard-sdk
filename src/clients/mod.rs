@@ -1,1 +1,3 @@
-pub mod jobs;
+mod jobs;
+
+pub use jobs::JobSubmissionClient;
