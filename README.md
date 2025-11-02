@@ -9,3 +9,9 @@ A simple Rust client for the [Ray](ray-url) dashboard REST API.
 [mit-url]: https://github.com/sfriedowitz/ray-dashboard-sdk/blob/main/LICENSE
 
 ## Overview
+
+## TODO
+
+1) Implement example usage crates
+2) Expand unit tests for schemas
+3) Implement Serve REST API bindings
