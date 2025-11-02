@@ -1,6 +1,6 @@
-use std::time::Duration;
+use std::time::{Duration, Instant};
 
-use tokio::time::{Instant, sleep};
+use futures_timer::Delay;
 use tracing::info;
 
 use crate::schemas::jobs::{
@@ -126,7 +126,7 @@ impl JobSubmissionClient {
                 }
             }
 
-            sleep(Duration::from_millis(500)).await;
+            Delay::new(Duration::from_millis(500)).await;
         }
     }
 }

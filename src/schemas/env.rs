@@ -12,15 +12,18 @@ pub struct RuntimeEnvConfig {
 }
 
 impl RuntimeEnvConfig {
+    /// Create a new RuntimeEnvConfig.
     pub fn new() -> Self {
         Default::default()
     }
 
+    /// Set the setup timeout seconds for the runtime environment.
     pub fn with_setup_timeout_seconds(mut self, seconds: u64) -> Self {
         self.setup_timeout_seconds = Some(seconds);
         self
     }
 
+    /// Set the eager install flag for the runtime environment.
     pub fn with_eager_install(mut self, eager: bool) -> Self {
         self.eager_install = Some(eager);
         self
@@ -44,42 +47,43 @@ pub struct RuntimeEnv {
 }
 
 impl RuntimeEnv {
+    /// Create a new RuntimeEnv.
     pub fn new() -> Self {
         Default::default()
     }
 
+    /// Set the working directory for the runtime environment.
     pub fn with_working_dir(mut self, working_dir: impl Into<String>) -> Self {
         self.working_dir = Some(working_dir.into());
         self
     }
 
-    pub fn with_env_var(mut self, name: impl Into<String>, value: impl Into<String>) -> Self {
-        if self.env_vars.is_none() {
-            self.env_vars = Some(HashMap::new());
-        }
-        self.env_vars.as_mut().unwrap().insert(name.into(), value.into());
+    /// Set environment variables for the runtime environment.
+    pub fn with_env_vars(mut self, env_vars: HashMap<String, String>) -> Self {
+        self.env_vars = Some(env_vars);
         self
     }
 
-    pub fn with_py_module(mut self, module: impl Into<String>) -> Self {
-        if self.py_modules.is_none() {
-            self.py_modules = Some(Vec::new());
-        }
-        self.py_modules.as_mut().unwrap().push(module.into());
+    /// Set the Python modules for the runtime environment.
+    pub fn with_py_modules(mut self, modules: &[String]) -> Self {
+        self.py_modules = Some(modules.to_vec());
         self
     }
 
+    /// Set the configuration for the runtime environment.  
     pub fn with_config(mut self, config: RuntimeEnvConfig) -> Self {
         self.config = Some(config);
         self
     }
 
-    pub fn with_pip(mut self, pip: &[String]) -> Self {
+    /// Set the pip packages for the runtime environment.
+    pub fn with_pip_packages(mut self, pip: &[String]) -> Self {
         self.pip = Some(pip.to_vec());
         self
     }
 
-    pub fn with_uv(mut self, uv: &[String]) -> Self {
+    /// Set the UV packages for the runtime environment.    
+    pub fn with_uv_packages(mut self, uv: &[String]) -> Self {
         self.uv = Some(uv.to_vec());
         self
     }

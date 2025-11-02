@@ -28,24 +28,25 @@ impl JobStatus {
 
 #[derive(Debug, Default, Clone, serde::Deserialize, serde::Serialize)]
 pub struct JobSubmitRequest {
-    entrypoint: String,
+    pub entrypoint: String,
     #[serde(skip_serializing_if = "Option::is_none")]
-    submission_id: Option<String>,
+    pub submission_id: Option<String>,
     #[serde(skip_serializing_if = "Option::is_none")]
-    runtime_env: Option<RuntimeEnv>,
+    pub runtime_env: Option<RuntimeEnv>,
     #[serde(skip_serializing_if = "Option::is_none")]
-    metadata: Option<HashMap<String, String>>,
+    pub metadata: Option<HashMap<String, String>>,
     #[serde(skip_serializing_if = "Option::is_none")]
-    entrypoint_num_cpus: Option<f64>,
+    pub entrypoint_num_cpus: Option<f64>,
     #[serde(skip_serializing_if = "Option::is_none")]
-    entrypoint_num_gpus: Option<f64>,
+    pub entrypoint_num_gpus: Option<f64>,
     #[serde(skip_serializing_if = "Option::is_none")]
-    entrypoint_memory: Option<u64>,
+    pub entrypoint_memory: Option<u64>,
     #[serde(skip_serializing_if = "Option::is_none")]
-    entrypoint_resources: Option<HashMap<String, f64>>,
+    pub entrypoint_resources: Option<HashMap<String, f64>>,
 }
 
 impl JobSubmitRequest {
+    /// Create a new JobSubmitRequest with the required entrypoint.
     pub fn new(entrypoint: impl Into<String>) -> Self {
         Self {
             entrypoint: entrypoint.into(),
@@ -53,26 +54,25 @@ impl JobSubmitRequest {
         }
     }
 
-    pub fn with_entrypoint(mut self, entrypoint: impl Into<String>) -> Self {
-        self.entrypoint = entrypoint.into();
-        self
-    }
-
+    /// Set the submission ID for the job.
     pub fn with_submission_id(mut self, submission_id: impl Into<String>) -> Self {
         self.submission_id = Some(submission_id.into());
         self
     }
 
+    /// Set the runtime environment for the job.
     pub fn with_runtime_env(mut self, runtime_env: RuntimeEnv) -> Self {
         self.runtime_env = Some(runtime_env);
         self
     }
 
+    /// Set the metadata for the job.
     pub fn with_metadata(mut self, metadata: HashMap<String, String>) -> Self {
         self.metadata = Some(metadata);
         self
     }
 
+    /// Add a single metadata item for the job.
     pub fn with_metadata_item(mut self, key: impl Into<String>, value: impl Into<String>) -> Self {
         if self.metadata.is_none() {
             self.metadata = Some(HashMap::new());
@@ -81,21 +81,25 @@ impl JobSubmitRequest {
         self
     }
 
+    /// Set the number of CPUs for the job's entrypoint.
     pub fn with_entrypoint_num_cpus(mut self, num_cpus: f64) -> Self {
         self.entrypoint_num_cpus = Some(num_cpus);
         self
     }
 
+    /// Set the number of GPUs for the job's entrypoint.
     pub fn with_entrypoint_num_gpus(mut self, num_gpus: f64) -> Self {
         self.entrypoint_num_gpus = Some(num_gpus);
         self
     }
 
+    /// Set the memory (in bytes) for the job's entrypoint.
     pub fn with_entrypoint_memory(mut self, memory: u64) -> Self {
         self.entrypoint_memory = Some(memory);
         self
     }
 
+    /// Set custom resources for the job's entrypoint.
     pub fn with_entrypoint_resources(mut self, resources: HashMap<String, f64>) -> Self {
         self.entrypoint_resources = Some(resources);
         self
@@ -104,9 +108,9 @@ impl JobSubmitRequest {
 
 #[derive(Debug, Clone, serde::Deserialize, serde::Serialize)]
 pub struct JobDriverInfo {
-    id: String,
-    node_ip_address: String,
-    pid: String,
+    pub id: String,
+    pub node_ip_address: String,
+    pub pid: String,
 }
 
 #[derive(Debug, Clone, serde::Deserialize, serde::Serialize)]
