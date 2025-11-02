@@ -117,13 +117,13 @@ impl JobSubmissionClient {
                 return Ok(());
             }
 
-            if let Some(max_duration) = max_duration {
-                if start.elapsed() >= max_duration {
-                    return Err(crate::Error::Generic(format!(
-                        "Job {} did not reach terminal state within {:?}",
-                        submission_id, max_duration
-                    )));
-                }
+            if let Some(max_duration) = max_duration
+                && start.elapsed() >= max_duration
+            {
+                return Err(crate::Error::Generic(format!(
+                    "Job {} did not reach terminal state within {:?}",
+                    submission_id, max_duration
+                )));
             }
 
             Delay::new(Duration::from_millis(500)).await;
