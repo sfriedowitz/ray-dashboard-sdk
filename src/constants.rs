@@ -1,1 +1,1 @@
-pub static CLIENT_USER_AGENT: &str = "rust/ray-dashboard-client";
+pub static SDK_USER_AGENT: &str = "rust/ray-dashboard-sdk";

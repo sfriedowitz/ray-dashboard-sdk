@@ -103,20 +103,27 @@ pub struct JobDriverInfo {
 #[derive(Debug, Clone, serde::Deserialize, serde::Serialize)]
 pub struct JobDetails {
     #[serde(alias = "type")]
-    job_type: JobType,
-    entrypoint: String,
-    status: JobStatus,
-    submission_id: Option<String>,
-    driver_info: Option<JobDriverInfo>,
-    message: Option<String>,
-    error_type: Option<String>,
-    start_time: Option<u64>,
-    end_time: Option<u64>,
-    metadata: Option<HashMap<String, String>>,
-    runtime_env: Option<RuntimeEnv>,
-    driver_agent_http_address: Option<String>,
-    driver_node_id: Option<String>,
-    driver_exit_code: Option<i32>,
+    pub job_type: JobType,
+    pub entrypoint: String,
+    pub status: JobStatus,
+    pub submission_id: Option<String>,
+    pub driver_info: Option<JobDriverInfo>,
+    pub message: Option<String>,
+    pub error_type: Option<String>,
+    pub start_time: Option<u64>,
+    pub end_time: Option<u64>,
+    pub metadata: Option<HashMap<String, String>>,
+    pub runtime_env: Option<RuntimeEnv>,
+    pub driver_agent_http_address: Option<String>,
+    pub driver_node_id: Option<String>,
+    pub driver_exit_code: Option<i32>,
+}
+
+#[derive(Debug, Clone, serde::Deserialize, serde::Serialize)]
+pub struct JobVersionResponse {
+    version: String,
+    ray_version: String,
+    ray_commit: String,
 }
 
 #[derive(Debug, Clone, serde::Deserialize, serde::Serialize)]
