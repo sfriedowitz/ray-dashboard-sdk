@@ -8,27 +8,67 @@ on:
 
 jobs:
   style:
-    name: Check Formatting
+    name: Checks / Formatting
     runs-on: ubuntu-latest
     steps:
       - name: Checkout
         uses: actions/checkout@v5
+
       - name: Install rust
         uses: dtolnay/rust-toolchain@stable
         with:
           components: rustfmt
+
       - name: Check formatting
         run: cargo fmt -- --check
 
   lint:
-    name: Lint
+    name: Checks / Lint
     runs-on: ubuntu-latest
     steps:
       - name: Checkout
         uses: actions/checkout@v5
+
       - name: Install rust
         uses: dtolnay/rust-toolchain@stable
         with:
           components: clippy
+
       - name: Run clippy
         run: cargo clippy -- -D warnings
+
+  test_unit:
+    name: Tests / Unit
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v5
+
+      - name: Install rust
+        uses: dtolnay/rust-toolchain@stable
+
+      - name: Run unit tests
+        run: cargo test --lib
+
+  test_integration:
+    name: Tests / Unit
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v5
+
+      - name: Install rust
+        uses: dtolnay/rust-toolchain@stable
+
+      - name: Set up Docker
+        uses: docker/setup-docker-action@v4
+
+      - name: Launch Ray cluster via docker-compose
+        run: docker compose up -d
+
+      - name: Run integration tests
+        run: cargo test --test '*'
+
+      - name: Tear down docker compose
+        if: always()
+        run: docker compose down
