@@ -1,6 +1,6 @@
 services:
   ray:
-    image: rayproject/ray:latest
+    image: rayproject/ray:2.50.1
     container_name: ray
     command: >
       bash -c "

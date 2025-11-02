@@ -17,6 +17,15 @@ pub enum JobStatus {
     FAILED,
 }
 
+impl JobStatus {
+    pub fn is_terminal(&self) -> bool {
+        matches!(
+            self,
+            JobStatus::SUCCEEDED | JobStatus::FAILED | JobStatus::STOPPED
+        )
+    }
+}
+
 #[derive(Debug, Default, Clone, serde::Deserialize, serde::Serialize)]
 pub struct JobSubmitRequest {
     entrypoint: String,
@@ -121,9 +130,9 @@ pub struct JobDetails {
 
 #[derive(Debug, Clone, serde::Deserialize, serde::Serialize)]
 pub struct JobVersionResponse {
-    version: String,
-    ray_version: String,
-    ray_commit: String,
+    pub version: String,
+    pub ray_version: String,
+    pub ray_commit: String,
 }
 
 #[derive(Debug, Clone, serde::Deserialize, serde::Serialize)]
