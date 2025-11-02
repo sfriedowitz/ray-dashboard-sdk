@@ -51,7 +51,7 @@ jobs:
         run: cargo test --lib
 
   test_integration:
-    name: Tests / Unit
+    name: Tests / Integration
     runs-on: ubuntu-latest
     steps:
       - name: Checkout
