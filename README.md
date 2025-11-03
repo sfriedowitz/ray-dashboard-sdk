@@ -15,8 +15,14 @@ A simple Rust client for the [Ray]( https://docs.ray.io/en/latest/index.html#) D
 
 ## Overview
 
+> ⚠️ Work in progress
+>
+> Not ready for real usage yet. Missing most features.
+
+
 ## TODO
 
-1) Implement example usage crates
-2) Expand unit tests for schemas
-3) Implement Serve REST API bindings
+- Refactor to single dashboard cleint for all dashboard APIs
+- Expand unit tests for schemas
+- Implement Serve bindings
+- Implement examples
