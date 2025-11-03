@@ -1,6 +1,6 @@
 [package]
 name = "ray-dashboard-sdk"
-version = "0.1.1"
+version = "0.1.2"
 edition = "2024"
 description = "A simple Rust client for the Ray Dashboard REST API."
 keywords = ["rust", "ray", "dashboard", "sdk", "client"]
