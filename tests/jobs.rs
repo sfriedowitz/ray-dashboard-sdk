@@ -3,7 +3,7 @@ mod common;
 use std::time::Duration;
 
 use ray_dashboard_sdk::{
-    JobSubmissionClient,
+    JobSubmissionAPI, RayDashboardClient,
     schemas::jobs::{JobStatus, JobSubmitRequest},
 };
 
@@ -13,21 +13,8 @@ fn random_submission_id() -> String {
 }
 
 #[tokio::test]
-async fn test_ping() {
-    let client = JobSubmissionClient::new(common::RAY_DASHBOARD_URL).unwrap();
-    client.ping().await.expect("Able to ping Ray dashboard");
-}
-
-#[tokio::test]
-async fn test_get_version() {
-    let client = JobSubmissionClient::new(common::RAY_DASHBOARD_URL).unwrap();
-    let version = client.get_version().await.expect("Able to get version");
-    assert_eq!(version.ray_version, "2.50.1");
-}
-
-#[tokio::test]
 async fn test_submit_job() {
-    let client = JobSubmissionClient::new(common::RAY_DASHBOARD_URL).unwrap();
+    let client = RayDashboardClient::new(common::RAY_DASHBOARD_URL).unwrap();
 
     let submission_id = random_submission_id();
     let payload = JobSubmitRequest::new("echo Hello, World!").with_submission_id(&submission_id);
@@ -41,7 +28,7 @@ async fn test_submit_job() {
 
 #[tokio::test]
 async fn test_get_job() {
-    let client = JobSubmissionClient::new(common::RAY_DASHBOARD_URL).unwrap();
+    let client = RayDashboardClient::new(common::RAY_DASHBOARD_URL).unwrap();
 
     let entrypoint = "echo Hello, World!";
     let submission_id = random_submission_id();
@@ -65,7 +52,7 @@ async fn test_get_job() {
 
 #[tokio::test]
 async fn test_stop_and_delete_job() {
-    let client = JobSubmissionClient::new(common::RAY_DASHBOARD_URL).unwrap();
+    let client = RayDashboardClient::new(common::RAY_DASHBOARD_URL).unwrap();
 
     let submission_id = random_submission_id();
     let payload = JobSubmitRequest::new("sleep 60").with_submission_id(&submission_id);
@@ -91,7 +78,7 @@ async fn test_stop_and_delete_job() {
 
 #[tokio::test]
 async fn test_get_job_logs() {
-    let client = JobSubmissionClient::new(common::RAY_DASHBOARD_URL).unwrap();
+    let client = RayDashboardClient::new(common::RAY_DASHBOARD_URL).unwrap();
 
     let submission_id = random_submission_id();
     let payload = JobSubmitRequest::new("echo 'ABC123'").with_submission_id(&submission_id);
