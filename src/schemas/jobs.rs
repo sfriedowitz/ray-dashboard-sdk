@@ -133,13 +133,6 @@ pub struct JobDetails {
 }
 
 #[derive(Debug, Clone, serde::Deserialize, serde::Serialize)]
-pub struct JobVersionResponse {
-    pub version: String,
-    pub ray_version: String,
-    pub ray_commit: String,
-}
-
-#[derive(Debug, Clone, serde::Deserialize, serde::Serialize)]
 pub struct JobSubmitResponse {
     pub submission_id: String,
 }
