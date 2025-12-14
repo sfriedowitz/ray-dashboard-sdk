@@ -1,6 +1,6 @@
 [package]
 name = "ray-dashboard-sdk"
-version = "0.2.1"
+version = "0.2.2"
 edition = "2024"
 description = "A simple Rust client for the Ray Dashboard REST API."
 keywords = ["rust", "ray", "dashboard", "sdk", "client"]
@@ -28,4 +28,3 @@ zip = { version = "2.2.3", default-features = false, features = ["deflate"] }
 
 [dev-dependencies]
 tokio = { version = "1.48.0", features = ["full"] }
-uuid = { version = "1.18.1", features = ["v4"] }
