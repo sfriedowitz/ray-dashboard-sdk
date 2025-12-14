@@ -2,7 +2,6 @@ use std::time::{Duration, Instant};
 
 use async_trait::async_trait;
 use futures_timer::Delay;
-use std::path::Path;
 use tracing::debug;
 
 use crate::{
@@ -54,23 +53,17 @@ impl JobSubmissionAPI for RayDashboardClient {
 
         // Check if there's a runtime_env with a working_dir that needs to be uploaded
         if let Some(ref mut runtime_env) = payload.runtime_env
-            && let Some(ref working_dir) = runtime_env.working_dir
+            && let Some(ref working_dir_path) = runtime_env.working_dir
         {
-            // Check if this is a local path (not a URI)
-            if !working_dir.contains("://") {
-                let working_dir_path = Path::new(working_dir);
-                if working_dir_path.exists() && working_dir_path.is_dir() {
-                    debug!("Uploading working directory: {:?}", working_dir_path);
+            debug!("Uploading working directory: {:?}", working_dir_path);
 
-                    // Upload the directory and get the URI
-                    let package_uri = self.upload_directory_if_needed(working_dir_path).await?;
+            // Upload the directory and get the URI
+            let package_uri = self.upload_directory_if_needed(working_dir_path).await?;
 
-                    // Update the runtime_env with the package URI
-                    runtime_env.working_dir = Some(package_uri.clone());
+            debug!("Working directory uploaded, URI: {}", package_uri);
 
-                    debug!("Working directory uploaded, URI: {}", package_uri);
-                }
-            }
+            // Update the runtime_env with the package URI string
+            runtime_env.working_dir = Some(package_uri.into());
         }
 
         let path = "/api/jobs/";

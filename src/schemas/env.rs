@@ -2,6 +2,7 @@
 
 use serde;
 use std::collections::HashMap;
+use std::path::{Path, PathBuf};
 
 #[derive(Debug, Default, Clone, serde::Deserialize, serde::Serialize)]
 pub struct RuntimeEnvConfig {
@@ -33,11 +34,9 @@ impl RuntimeEnvConfig {
 #[derive(Debug, Default, Clone, serde::Deserialize, serde::Serialize)]
 pub struct RuntimeEnv {
     #[serde(skip_serializing_if = "Option::is_none")]
-    pub working_dir: Option<String>,
+    pub working_dir: Option<PathBuf>,
     #[serde(skip_serializing_if = "Option::is_none")]
     pub env_vars: Option<HashMap<String, String>>,
-    #[serde(skip_serializing_if = "Option::is_none")]
-    pub py_modules: Option<Vec<String>>,
     #[serde(skip_serializing_if = "Option::is_none")]
     pub config: Option<RuntimeEnvConfig>,
     #[serde(skip_serializing_if = "Option::is_none")]
@@ -53,9 +52,9 @@ impl RuntimeEnv {
     }
 
     /// Set the working directory for the runtime environment.
-    /// This can be either a URI (e.g., "gcs://_ray_pkg_abc123.zip") or a local path.
-    pub fn with_working_dir(mut self, working_dir: impl Into<String>) -> Self {
-        self.working_dir = Some(working_dir.into());
+    /// This should be a local directory path that will be uploaded to Ray.
+    pub fn with_working_dir(mut self, working_dir: &Path) -> Self {
+        self.working_dir = Some(working_dir.to_path_buf());
         self
     }
 
@@ -65,13 +64,7 @@ impl RuntimeEnv {
         self
     }
 
-    /// Set the Python modules for the runtime environment.
-    pub fn with_py_modules(mut self, modules: &[String]) -> Self {
-        self.py_modules = Some(modules.to_vec());
-        self
-    }
-
-    /// Set the configuration for the runtime environment.  
+    /// Set the configuration for the runtime environment.
     pub fn with_config(mut self, config: RuntimeEnvConfig) -> Self {
         self.config = Some(config);
         self
@@ -83,7 +76,7 @@ impl RuntimeEnv {
         self
     }
 
-    /// Set the UV packages for the runtime environment.    
+    /// Set the UV packages for the runtime environment.
     pub fn with_uv_packages(mut self, uv: &[String]) -> Self {
         self.uv = Some(uv.to_vec());
         self
@@ -93,6 +86,7 @@ impl RuntimeEnv {
 #[cfg(test)]
 mod tests {
     use super::RuntimeEnv;
+    use std::path::Path;
 
     #[test]
     fn test_skip_none() {
@@ -104,9 +98,12 @@ mod tests {
 
     #[test]
     fn test_round_trip() {
-        let env = RuntimeEnv::new().with_working_dir("/tests");
+        let env = RuntimeEnv::new().with_working_dir(Path::new("/tests"));
         let value = serde_json::to_value(&env).unwrap();
         let deserialized_env: RuntimeEnv = serde_json::from_value(value).unwrap();
-        assert_eq!(deserialized_env.working_dir, Some("/tests".to_string()));
+        assert_eq!(
+            deserialized_env.working_dir,
+            Some(Path::new("/tests").to_path_buf())
+        );
     }
 }

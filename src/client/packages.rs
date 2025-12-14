@@ -5,7 +5,7 @@ use tracing::debug;
 
 use crate::{
     RayDashboardClient,
-    utils::packaging::{create_package, get_uri_for_directory, get_uri_for_package},
+    utils::packaging::{create_package, get_uri_for_directory},
 };
 
 #[async_trait]
@@ -16,14 +16,8 @@ pub trait PackagesAPI {
     /// Upload a package to the Ray cluster
     async fn upload_package(&self, package_uri: &str, data: Vec<u8>) -> crate::Result<()>;
 
-    /// Upload a package file to the Ray cluster
-    async fn upload_package_file(&self, package_path: &Path) -> crate::Result<String>;
-
     /// Upload a directory as a package to the Ray cluster (always respects .gitignore)
     async fn upload_directory(&self, directory: &Path) -> crate::Result<String>;
-
-    /// Upload a package if it doesn't already exist
-    async fn upload_package_if_needed(&self, package_uri: &str, data: Vec<u8>) -> crate::Result<()>;
 
     /// Upload a directory if it doesn't already exist (always respects .gitignore)
     async fn upload_directory_if_needed(&self, directory: &Path) -> crate::Result<String>;
@@ -54,7 +48,7 @@ impl PackagesAPI for RayDashboardClient {
                     response.status()
                 ))),
             },
-            Err(e) => Err(crate::Error::from(e)),
+            Err(e) => Err(e.into()),
         }
     }
 
@@ -80,29 +74,23 @@ impl PackagesAPI for RayDashboardClient {
         Ok(())
     }
 
-    async fn upload_package_file(&self, package_path: &Path) -> crate::Result<String> {
-        let package_uri = get_uri_for_package(package_path)?;
-
-        let mut file = File::open(package_path).await?;
-
-        let mut data = Vec::new();
-        file.read_to_end(&mut data).await?;
-
-        self.upload_package(&package_uri, data).await?;
-        Ok(package_uri)
-    }
-
     async fn upload_directory(&self, directory: &Path) -> crate::Result<String> {
-        // Create a temporary zip file
-        let temp_dir = std::env::temp_dir();
         let package_uri = get_uri_for_directory(directory)?;
-        let temp_package_path = temp_dir.join(format!("ray_pkg_{}.zip", uuid::Uuid::new_v4()));
+
+        // Create a temporary zip file
+        let temp_file = tempfile::Builder::new()
+            .prefix("ray_pkg_")
+            .suffix(".zip")
+            .tempfile()
+            .map_err(|e| crate::Error::Generic(format!("Failed to create temp file: {}", e)))?;
+
+        let temp_path = temp_file.path();
 
         // Create the package
-        create_package(directory, &temp_package_path)?;
+        create_package(directory, temp_path)?;
 
         // Read the package data
-        let mut file = File::open(&temp_package_path).await?;
+        let mut file = File::open(temp_path).await?;
 
         let mut data = Vec::new();
         file.read_to_end(&mut data).await?;
@@ -110,19 +98,7 @@ impl PackagesAPI for RayDashboardClient {
         // Upload the package
         self.upload_package(&package_uri, data).await?;
 
-        // Clean up temp file
-        std::fs::remove_file(&temp_package_path)?;
-
         Ok(package_uri)
-    }
-
-    async fn upload_package_if_needed(&self, package_uri: &str, data: Vec<u8>) -> crate::Result<()> {
-        if !self.package_exists(package_uri).await? {
-            self.upload_package(package_uri, data).await?;
-        } else {
-            debug!("Package {} already exists, skipping upload", package_uri);
-        }
-        Ok(())
     }
 
     async fn upload_directory_if_needed(&self, directory: &Path) -> crate::Result<String> {
