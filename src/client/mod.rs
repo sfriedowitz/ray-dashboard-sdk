@@ -3,6 +3,7 @@ use tracing::info;
 use crate::schemas::common::RayVersionResponse;
 
 pub mod jobs;
+pub mod packages;
 
 #[derive(Debug, Clone)]
 pub struct RayDashboardClient {

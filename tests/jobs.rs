@@ -3,8 +3,11 @@ mod common;
 use std::time::Duration;
 
 use ray_dashboard_sdk::{
-    JobSubmissionAPI, RayDashboardClient,
-    schemas::jobs::{JobStatus, JobSubmitRequest},
+    JobSubmissionAPI, PackagesAPI, RayDashboardClient,
+    schemas::{
+        env::RuntimeEnv,
+        jobs::{JobStatus, JobSubmitRequest},
+    },
 };
 
 fn random_submission_id() -> String {
@@ -96,4 +99,83 @@ async fn test_get_job_logs() {
         .expect("Able to get job logs");
     let log_lines = logs.lines().collect::<Vec<&str>>();
     assert!(log_lines.iter().any(|line| line.contains("ABC123")));
+}
+
+#[tokio::test]
+async fn test_submit_job_with_working_dir() {
+    let client = RayDashboardClient::new(common::RAY_DASHBOARD_URL).unwrap();
+
+    // Use the test resources directory
+    let working_dir = std::path::Path::new(env!("CARGO_MANIFEST_DIR")).join("tests/resources");
+
+    // Create a runtime environment with the working directory as a local path
+    let runtime_env = RuntimeEnv::new().with_working_dir(working_dir.to_str().unwrap());
+
+    let submission_id = random_submission_id();
+    let payload = JobSubmitRequest::new("python script.py")
+        .with_submission_id(&submission_id)
+        .with_runtime_env(runtime_env);
+
+    // Submit the job - this should automatically upload the working directory
+    let response = client.submit_job(&payload).await.expect("Able to submit job");
+    assert_eq!(response.submission_id, submission_id);
+
+    // Wait for job to complete
+    client
+        .wait_for_terminal(&submission_id, Some(Duration::from_secs(30)))
+        .await
+        .unwrap();
+
+    // Check the job status and logs
+    let status = client.get_job_status(&submission_id).await.unwrap();
+    assert_eq!(status, JobStatus::SUCCEEDED);
+
+    let logs = client.get_job_logs(&submission_id).await.unwrap();
+    let log_lines = logs.lines().collect::<Vec<&str>>();
+    assert!(
+        log_lines
+            .iter()
+            .any(|line| line.contains("Hello from working directory!"))
+    );
+}
+
+#[tokio::test]
+async fn test_submit_job_with_working_dir_uri() {
+    let client = RayDashboardClient::new(common::RAY_DASHBOARD_URL).unwrap();
+
+    // Use the test resources directory
+    let working_dir = std::path::Path::new(env!("CARGO_MANIFEST_DIR")).join("tests/resources");
+
+    // Upload the directory first and get the URI
+    let package_uri = client.upload_directory(&working_dir).await.unwrap();
+
+    // Create a runtime environment with the package URI
+    let runtime_env = RuntimeEnv::new().with_working_dir(&package_uri);
+
+    let submission_id = random_submission_id();
+    let payload = JobSubmitRequest::new("python script.py")
+        .with_submission_id(&submission_id)
+        .with_runtime_env(runtime_env);
+
+    // Submit the job - this should NOT upload again since we're using a URI
+    let response = client.submit_job(&payload).await.expect("Able to submit job");
+    assert_eq!(response.submission_id, submission_id);
+
+    // Wait for job to complete
+    client
+        .wait_for_terminal(&submission_id, Some(Duration::from_secs(30)))
+        .await
+        .unwrap();
+
+    // Check the job status and logs
+    let status = client.get_job_status(&submission_id).await.unwrap();
+    assert_eq!(status, JobStatus::SUCCEEDED);
+
+    let logs = client.get_job_logs(&submission_id).await.unwrap();
+    let log_lines = logs.lines().collect::<Vec<&str>>();
+    assert!(
+        log_lines
+            .iter()
+            .any(|line| line.contains("Hello from working directory!"))
+    );
 }

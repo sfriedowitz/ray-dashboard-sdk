@@ -6,9 +6,9 @@ use std::collections::HashMap;
 #[derive(Debug, Default, Clone, serde::Deserialize, serde::Serialize)]
 pub struct RuntimeEnvConfig {
     #[serde(skip_serializing_if = "Option::is_none")]
-    setup_timeout_seconds: Option<u64>,
+    pub setup_timeout_seconds: Option<u64>,
     #[serde(skip_serializing_if = "Option::is_none")]
-    eager_install: Option<bool>,
+    pub eager_install: Option<bool>,
 }
 
 impl RuntimeEnvConfig {
@@ -33,17 +33,17 @@ impl RuntimeEnvConfig {
 #[derive(Debug, Default, Clone, serde::Deserialize, serde::Serialize)]
 pub struct RuntimeEnv {
     #[serde(skip_serializing_if = "Option::is_none")]
-    working_dir: Option<String>,
+    pub working_dir: Option<String>,
     #[serde(skip_serializing_if = "Option::is_none")]
-    env_vars: Option<HashMap<String, String>>,
+    pub env_vars: Option<HashMap<String, String>>,
     #[serde(skip_serializing_if = "Option::is_none")]
-    py_modules: Option<Vec<String>>,
+    pub py_modules: Option<Vec<String>>,
     #[serde(skip_serializing_if = "Option::is_none")]
-    config: Option<RuntimeEnvConfig>,
+    pub config: Option<RuntimeEnvConfig>,
     #[serde(skip_serializing_if = "Option::is_none")]
-    pip: Option<Vec<String>>,
+    pub pip: Option<Vec<String>>,
     #[serde(skip_serializing_if = "Option::is_none")]
-    uv: Option<Vec<String>>,
+    pub uv: Option<Vec<String>>,
 }
 
 impl RuntimeEnv {
@@ -53,6 +53,7 @@ impl RuntimeEnv {
     }
 
     /// Set the working directory for the runtime environment.
+    /// This can be either a URI (e.g., "gcs://_ray_pkg_abc123.zip") or a local path.
     pub fn with_working_dir(mut self, working_dir: impl Into<String>) -> Self {
         self.working_dir = Some(working_dir.into());
         self

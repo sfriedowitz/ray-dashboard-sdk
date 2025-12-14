@@ -1,0 +1,4 @@
+# Test gitignore to ensure it's respected during packaging
+*.pyc
+__pycache__/
+.pytest_cache/
