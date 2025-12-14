@@ -15,13 +15,38 @@ A simple Rust client for the [Ray]( https://docs.ray.io/en/latest/index.html#) D
 
 ## Overview
 
-> ⚠️ Work in progress
->
-> Not ready for real usage yet. Missing most features.
+A Rust SDK for the Ray Dashboard REST API. Currently supports the Jobs API for submitting and managing Ray jobs.
 
+See [examples/](examples/) for usage examples.
+
+## Contributing
+
+### Running Tests
+
+Integration tests require a running Ray cluster:
+
+```bash
+# Start Ray cluster
+docker compose up -d
+
+# Run tests
+cargo test
+
+# Stop Ray cluster
+docker compose down
+```
+
+### Running Examples
+
+Examples also require the Ray cluster:
+
+```bash
+docker compose up -d
+cargo run --example simple
+cargo run --example axum
+```
 
 ## TODO
 
 - Expand unit tests for schemas
-- Implement Serve bindings
-- Implement examples
+- Implement Serve API bindings
