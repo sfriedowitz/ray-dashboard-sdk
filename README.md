@@ -22,8 +22,6 @@ A simple Rust client for the [Ray]( https://docs.ray.io/en/latest/index.html#) D
 
 ## TODO
 
-- **[URGENT]** Add support for `working_dir` uploads as part of RuntimeEnv when submitting jobs
-- Refactor to single dashboard client for all dashboard APIs
 - Expand unit tests for schemas
 - Implement Serve bindings
 - Implement examples
