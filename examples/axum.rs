@@ -34,7 +34,7 @@ struct JobRequest {
 
 #[derive(Debug, Serialize)]
 struct JobResponse {
-    submission_id: String,
+    job_id: String,
 }
 
 #[derive(Debug, Error)]
@@ -77,12 +77,8 @@ async fn submit_job(
     // Submit the job to Ray
     let response: JobSubmitResponse = state.ray_client.submit_job(&job_request).await?;
 
-    // Keep the temp directory alive until the job is submitted
-    // In production, you'd want to manage this more carefully
-    drop(temp_dir);
-
     Ok(Json(JobResponse {
-        submission_id: response.submission_id,
+        job_id: response.submission_id,
     }))
 }
 
@@ -109,12 +105,10 @@ async fn main() {
         .with_state(state);
 
     // Get the server bind address
-    let bind_addr = std::env::var("BIND_ADDR").unwrap_or("127.0.0.1:3000".to_string());
+    let bind_addr = "127.0.0.1:8000";
 
     info!("Starting Axum server on {}", bind_addr);
     info!("Ray Dashboard URL: {}", ray_url);
-    info!("Endpoint: POST /api/jobs");
-    info!("Body: {{ \"script\": \"<python code>\" }}");
 
     // Start the server
     let listener = tokio::net::TcpListener::bind(&bind_addr)
